@@ -1,4 +1,4 @@
-// Copyright 2019 Northern.tech AS
+// Copyright 2018 Northern.tech AS
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -21,28 +21,26 @@ import (
 
 	"log"
 
-	"github.com/mendersoftware/go-lib-micro/mongo/dbtest"
+	"github.com/globalsign/mgo/dbtest"
 )
 
 var db *dbtest.DBServer
 
 // Overwrites test execution and allows for test database setup
 func TestMain(m *testing.M) {
-	dbdir, _ := ioutil.TempDir("/tmp", "dbsetup-test")
+	log.Println("test")
+	dbdir, _ := ioutil.TempDir("", "dbsetup-test")
 	// os.Exit would ignore defers, workaround
 	status := func() int {
 		// Start test database server
 		if !testing.Short() {
 			db = &dbtest.DBServer{}
 			db.SetPath(dbdir)
-			db.SetTimeout(64)
-			_ = db.Session()
 			// Tear down databaser server
 			// Note:
 			// if test panics, it will require manual database tier down
 			// testing package executes tests in goroutines therefore
 			// we can't catch panics issued in tests.
-			log.Printf("mongo: started mock mongo (mgo/dbtest)")
 			defer os.RemoveAll(dbdir)
 			defer db.Stop()
 		}
